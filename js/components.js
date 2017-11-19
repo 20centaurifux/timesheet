@@ -1,7 +1,7 @@
 Vue.component('taskTable',
 {
 	props: ['tasks', 'availableTasks', 'availableProjects'],
-	template: taskTable,
+	template: '#taskTable'
 });
 
 Vue.component('taskRow',
@@ -11,7 +11,7 @@ Vue.component('taskRow',
 	{
 		return {initialized: false}
 	},
-	template: taskRow,
+	template: '#taskRow',
 	mounted: function()
 	{
 		// column 1 - timepicker:
@@ -115,7 +115,7 @@ Vue.component('removeTaskButton',
 
 Vue.component('datePicker',
 {
-	template: datePicker,
+	template: '#datePicker',
 	mounted: function()
 	{
 		$(this.$el).find('.date:first')
