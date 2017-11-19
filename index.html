@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/bootstrap-timepicker.min.css">
+	<link rel="stylesheet" href="css/bootstrap-select.min.css">
+	<link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
+
+	<script src="js/jquery.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/bootstrap-timepicker.js"></script>
+	<script src="js/bootstrap-select.min.js"></script>
+	<script src="js/moment.min.js"></script>
+	<script src="js/moment.min.js"></script>
+	<script src="js/bootstrap-datetimepicker.min.js"></script>
+	<script src="js/vue.min.js"></script>
+
+	<template id="taskTable" inline-template>
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th class="text-center">
+						Time
+					</th>
+					<th class="text-center">
+						Task
+					</th>
+					<th class="text-center">
+						Project
+					</th>
+					<th class="text-center">
+						Actions
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="task in this.tasks"
+				    :task="task"
+				    :available-tasks="availableTasks"
+				    :available-projects="availableProjects"
+				    :key="task.id"
+				    is="task-row"></tr>
+			</tbody>
+		</table>
+	</template>
+
+	<template id="taskRow" inline-template>
+		<tr>
+			<td>
+				<div class="input-group bootstrap-timepicker timepicker">
+					<input type="text" class="form-control input-small">
+					<span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+				</div>
+			</td>
+			<td>
+				<select></select>
+			</td>
+			<td></td>
+			<td><remove-task-button :task="task"></td>
+		</tr>
+	</template>
+
+	<template id="datePicker" inline-template>
+		<div class="form-group">
+			<div class="input-group date">
+			<input type='text' class="form-control" />
+			<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span> </span>
+		</div>
+	</template>
+
+	<script type="text/javascript">
+		var _projects = {'Customers': ['Customer A', 'Customer B'], 'New Features': ['Module A', 'Module B'], 'Products': ['Product A', 'Product B']};
+		var _taskList = {'Local support': {productive: false},
+		                'Support': {'productive': true, 'projects': 'Customers'},
+		                'Bugfixing': {'productive': false, projects: 'Products'},
+		                'Development': {'productive': true, 'projects': 'New Features'},
+		                'Customization': {'productive': true, 'projects': 'Customers'},
+		                'Documentation': {'productive': false, projects: 'Products'},
+		                'Meeting': {'productive': false}};
+		var _entries = [{id: 1, hours: '00:30', task: 'Support', project: 'Customer B'}, {id: 2, hours: '02:30', task: 'Bugfixing', project: 'Product B'}];
+
+		$(document).ready(function()
+		{
+			Vue.component('taskTable',
+			{
+				props: ['tasks', 'availableTasks', 'availableProjects'],
+				template: taskTable,
+			});
+
+			Vue.component('taskRow',
+			{
+				props: ['task', 'availableTasks', 'availableProjects'],
+				data: function()
+				{
+					return {initialized: false}
+				},
+				template: taskRow,
+				mounted: function()
+				{
+					// column 1 - timepicker:
+					$(this.$el).find('input')
+						.timepicker({showMeridian: false, maxHours: 12, defaultTime: '00:00 AM'}).val(this.task['hours'])
+						.bind('change', this.notifyUpdate);
+
+					// column 2 - task list:
+					var source = '';
+
+					for(var k in this.availableTasks)
+					{
+						source += '<option>' + k + '</option>';
+					}
+
+					$(this.$el).find('select:first')
+						.addClass('selectpicker')
+						.bind('change', this.taskChanged)
+						.html(source)
+						.val(this.task['task'])
+						.selectpicker({liveSearch: true});
+
+					// populate column 3 by calling taskChanged() event:
+					this.taskChanged(true);
+				},
+				methods:
+				{
+					taskChanged: function(internal)
+					{
+						var el = $(this.$el).find('select:first').get(0);
+						var taskName = $(el).val();
+						var projectSource = this.availableTasks[taskName]['projects'];
+
+						if(projectSource)
+						{
+							var child = document.createElement('select');
+
+							$(child).addClass('selectpicker');
+							$(child).html(this.availableProjects[projectSource].map(function(t) {return '<option>' + t + '</option>'}).join(''));
+						}
+
+						$(el).parents('tr').find('td:eq(2)').empty();
+
+						if(child)
+						{
+							$(el).parents('tr').find('td:eq(2)').append(child);
+
+							if($(child).is('select'))
+							{
+								$(child).val(this.task['project'])
+									.selectpicker({liveSearch: true})
+									.bind('change', this.notifyUpdate);
+							}
+						}
+
+						if(this.initialized)
+						{
+							this.notifyUpdate();
+						}
+						else
+						{
+							this.initialized = true;
+						}
+					},
+					notifyUpdate: function()
+					{
+						var task = {id: this.task.id,
+						            hours: $(this.$el).find('input').val(),
+						            task: $(this.$el).find('select:first').val(),
+							    project: $(this.$el).find('select:eq(1)').val()};
+
+						app.$emit('task-updated', task)
+					}
+				}
+			});
+
+			Vue.component('addTaskButton',
+			{
+				template: '<button class="btn btn-primary center-block" @click="createTask()">Add</button>',
+				methods:
+				{
+					createTask: function()
+					{
+						app.$emit('create-task');
+					}
+				}
+			});
+
+			Vue.component('removeTaskButton',
+			{
+				props: ['task'],
+				template: '<button class="btn btn-danger" @click="removeTask()">Remove</button>',
+				methods:
+				{
+					removeTask: function()
+					{
+						app.$emit('task-removed', this.task);
+					}
+				}
+			});
+
+			Vue.component('datePicker',
+			{
+				template: datePicker,
+				mounted: function()
+				{
+					$(this.$el).find('.date:first')
+						.datetimepicker({format: 'DD.MM.YYYY', defaultDate: new Date(), showTodayButton: true})
+						.on('dp.change', function(e) { app.$emit('date-changed', e.date) });
+				}
+			});
+
+			app = new Vue(
+			{
+				el: '#root',
+				data:
+				{
+					tasks: [],
+					availableTasks: _taskList,
+					availableProjects: _projects,
+					date: new Date()
+				},
+				created: function()
+				{
+					this.$on('task-removed', function(task)
+					{
+						var index = this.tasks.findIndex(function(e) {return e.id == task.id});
+						this.tasks.splice(index, 1);
+					});
+
+					this.$on('create-task', function()
+					{
+						var e = {id: 23, hours: '12:37', task: 'Support', project: 'Customer B'};
+						this.tasks.push(e)
+					});
+
+					this.$on('date-changed', function(dt)
+					{
+						this.date = dt;
+						this.loadDay(dt);
+					});
+
+					this.$on('task-updated', function(task)
+					{
+						alert(JSON.stringify(task));
+					});
+				},
+				mounted: function()
+				{
+					this.loadDay(this.date);
+				},
+				methods:
+				{
+					loadDay(dt)
+					{
+						var tasks = this.tasks;
+						
+						tasks.splice(0);
+
+						_entries.forEach(function(el)
+						{
+							tasks.push(el);
+						});
+					}
+				}
+			});
+		});
+	</script>
+  </head>
+  <body>
+
+  <div class="container" id="root">
+	<div class="row">
+		<div class="col-sm-4 col-sm-offset-4">
+			<date-picker></date-picker>
+		</div>
+	</div>
+
+	<div class="row">
+		<task-table :tasks="tasks" :available-tasks="availableTasks" :available-projects="availableProjects"></task-table>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12 text-center">
+			<add-task-button :tasks="tasks"></add-task-button>
+		</div>
+	</div>
+  </div>
+
+  </body>
+</html>
