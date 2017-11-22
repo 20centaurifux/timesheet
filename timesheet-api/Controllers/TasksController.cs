@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using timesheet_api.Models;
 using timesheet_api.Models.View;
 
 namespace timesheet_api.Controllers
 {
+    [Authorize]
     [Route("/[controller]")]
     public class TasksController : Controller
     {

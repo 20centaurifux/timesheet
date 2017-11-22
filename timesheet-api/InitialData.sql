@@ -1,3 +1,4 @@
+insert into Users (Name, Password) values ('FoxMulder', '203B70B5AE883932161BBD0BDED9357E763E63AFCE98B16230BE33F0B94C2CC5')
 insert into ProjectGroups(Name) values ('Customers')
 insert into Projects(GroupId, Name) values (1, 'Customer A')
 insert into Projects(GroupId, Name) values (1, 'Customer B')
