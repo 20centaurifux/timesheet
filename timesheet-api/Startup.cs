@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Bazinga.AspNetCore.Authentication.Basic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,10 +33,20 @@ namespace timesheet_api
         {
             services.AddDbContext<Models.TimesheetContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc();
-            services.AddAuthentication(options => {
-                options.DefaultScheme = BasicAuthenticationDefaults.AuthenticationScheme;})
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<Utils.UserAuthentication>();
+            services.AddTransient<IAuthorizationHandler, Utils.ResourceOwnerHandler>();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = BasicAuthenticationDefaults.AuthenticationScheme;
+            })
             .AddBasicAuthentication<Utils.BasicAuthVerifier>();
-            services.AddTransient<Utils.UserAuthentication>();
+            
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("TimesheetOwner", policy => policy.Requirements.Add(new Utils.ResourceOwnerRequirement(2)));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

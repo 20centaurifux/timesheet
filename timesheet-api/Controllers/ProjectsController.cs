@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using timesheet_api.Models;
+using timesheet_api.Utils;
 
 namespace timesheet_api.Controllers
 {
@@ -27,8 +28,7 @@ namespace timesheet_api.Controllers
 
             foreach(var group in _context.ProjectGroups.Include(g => g.Projects))
             {
-                //m[group.Name] = group.Projects.Select(p => p.Name);
-                m[group.Name] = new string[] { timesheet_api.Utils.Crypto.PasswordHash("trustno1") };
+                m[group.Name] = group.Projects.Select(p => p.Name);
             }
 
             return m;

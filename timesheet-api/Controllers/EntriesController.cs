@@ -10,6 +10,7 @@ using timesheet_api.Models.View;
 namespace timesheet_api.Controllers
 {
     [Authorize]
+    [Authorize(Policy="TimesheetOwner")]
     [Route("/[controller]")]
     public class EntriesController : Controller
     {
