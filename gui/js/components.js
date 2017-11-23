@@ -120,6 +120,6 @@ Vue.component('datePicker',
 	{
 		$(this.$el).find('.date:first')
 			.datetimepicker({format: 'DD.MM.YYYY', defaultDate: new Date(), showTodayButton: true})
-			.on('dp.change', function(e) { app.$emit('date-changed', e.date) });
+			.on('dp.change', function(e) { app.$emit('date-changed', e.date.toDate()) });
 	}
 });

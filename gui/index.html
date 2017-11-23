@@ -19,6 +19,7 @@
 	<script src="js/bootstrap-datetimepicker.min.js"></script>
 	<script src="js/vue.min.js"></script>
 	<script src="js/components.js"></script>
+	<script src="js/timesheet.rest.js"></script>
 
 	<template id="taskTable" inline-template>
 		<table class="table table-bordered table-hover">
@@ -77,16 +78,6 @@
 	</template>
 
 	<script type="text/javascript">
-		var _projects = {'Customers': ['Customer A', 'Customer B'], 'New Features': ['Module A', 'Module B'], 'Products': ['Product A', 'Product B']};
-		var _taskList = {'Local support': {productive: false},
-		                'Support': {'productive': true, 'projects': 'Customers'},
-		                'Bugfixing': {'productive': false, projects: 'Products'},
-		                'Development': {'productive': true, 'projects': 'New Features'},
-		                'Customization': {'productive': true, 'projects': 'Customers'},
-		                'Documentation': {'productive': false, projects: 'Products'},
-		                'Meeting': {'productive': false}};
-		var _entries = [{id: 1, hours: '00:30', task: 'Support', project: 'Customer B'}, {id: 2, hours: '02:30', task: 'Bugfixing', project: 'Product B'}];
-
 		$(document).ready(function()
 		{
 			app = new Vue(
@@ -95,51 +86,137 @@
 				data:
 				{
 					tasks: [],
-					availableTasks: _taskList,
-					availableProjects: _projects,
-					date: new Date()
+					availableTasks: {},
+					availableProjects: {},
+					date: new Date(),
+					restUser: "foxmulder",
+					restPassword: "trustno1"
 				},
 				created: function()
 				{
 					this.$on('task-removed', function(task)
 					{
-						var index = this.tasks.findIndex(function(e) {return e.id == task.id});
-						this.tasks.splice(index, 1);
+						var tasks = this.tasks;
+
+						this.rest().deleteEntry(task.id)
+							.success(function(task)
+							{
+								var index = tasks.findIndex(function(e) {return e.id == task.id});
+								tasks.splice(index, 1);
+							})
+							.fail(function()
+							{
+								alert("Oh no, something went wrong. Couldn't delete entry from timesheet, please try again later.");
+							});
 					});
 
 					this.$on('create-task', function()
 					{
-						var e = {id: 23, hours: '12:37', task: 'Support', project: 'Customer B'};
-						this.tasks.push(e)
+						if($.isEmptyObject(this.availableTasks))
+						{
+							alert("No tasks available.");
+						}
+						else
+						{
+							var task = Object.keys(this.availableTasks)[0];
+							var projectGroup = this.availableTasks[task]['projects'];
+							var project = null;
+
+							if(projectGroup)
+							{
+								project = this.availableProjects[projectGroup][0];
+							}
+
+							var self = this;
+
+							this.rest().createEntry(this.date, '00:00', task, project)
+								.success(function(e)
+								{
+									self.tasks.push(e)
+								})
+								.fail(function()
+								{
+									alert("Oh no, something went wrong. Couldn't create new entry, please try again later.");
+								});
+						}
 					});
 
 					this.$on('date-changed', function(dt)
 					{
 						this.date = dt;
-						this.loadDay(dt);
+						this.loadDay();
 					});
 
 					this.$on('task-updated', function(task)
 					{
-						alert(JSON.stringify(task));
+						this.rest().updateEntry(task)
+							.fail(function()
+							{
+								alert("Oh no, something went wrong. Couldn't update entry, please try again later.");
+							});
 					});
 				},
 				mounted: function()
 				{
-					this.loadDay(this.date);
+					this.loadData();
 				},
 				methods:
 				{
-					loadDay(dt)
+					loadData()
+					{
+						var self = this;
+						var rest = this.rest();
+
+						$.when(rest.getTasks(), rest.getProjects())
+							.done(function(tasks, projects)
+							{
+								if(tasks[2].status == 200 && projects[2].status == 200)
+								{
+									self.availableTasks = tasks[0];
+									self.availableProjects = projects[0];
+									self.loadDay();
+								}
+									
+							})
+							.fail(function(err)
+							{
+								if(err.status == 401)
+								{
+									alert("Authentication failed, please enter your credentials.");
+								}
+								else
+								{
+									alert("Ooooops, something went wrong. Please try again later.");
+								}
+							});
+					},
+					loadDay()
 					{
 						var tasks = this.tasks;
-						
+
 						tasks.splice(0);
 
-						_entries.forEach(function(el)
-						{
-							tasks.push(el);
-						});
+						this.rest().getEntries(this.date)
+							.success(function(entries)
+							{
+								entries.forEach(function(e)
+								{
+									tasks.push(e);
+								});
+							})
+							.fail(function()
+							{
+								alert("Ooooops, couldn't load entries. Please try again later.");
+							});
+					},
+					rest()
+					{
+						return new TimesheetREST({Username: this.restUser, Password: this.restPassword});
+					},
+					setCredentials(username, password)
+					{
+						this.restUser = username;
+						this.restPassword = password;
 					}
 				}
 			});
@@ -159,7 +236,7 @@
 		</ul>
 
 		<ul class="nav navbar-nav navbar-right">
-			<li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+			<li><a href="#"><span class="glyphicon glyphicon-user"></span> User</a></li>
 		</ul>
 	</div>
 </nav>
