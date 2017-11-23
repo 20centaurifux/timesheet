@@ -30,6 +30,7 @@ namespace timesheet_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().WithHeaders("accept", "content-type", "authorization")));
             services.AddDbContext<TimesheetContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -57,6 +58,7 @@ namespace timesheet_api
             }
 
             app.UseAuthentication();
+            app.UseCors("AllowAll");
             app.UseMvc();
         }
     }
