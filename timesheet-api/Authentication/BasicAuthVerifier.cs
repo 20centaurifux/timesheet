@@ -1,9 +1,10 @@
 using Bazinga.AspNetCore.Authentication.Basic;
 using System.Linq;
 using timesheet_api.Models;
+using timesheet_api.Data;
 using timesheet_api.Utils;
 
-namespace timesheet_api.Utils
+namespace timesheet_api.Authentication
 {
     public class BasicAuthVerifier : IBasicCredentialVerifier
     {

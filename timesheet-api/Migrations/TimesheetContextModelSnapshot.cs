@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 using timesheet_api.Models;
+using timesheet_api.Data;
 
 namespace timesheetapi.Migrations
 {

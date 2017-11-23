@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace timesheet_api.Utils
+namespace timesheet_api.Authentication
 {
-    public class ResourceOwnerHandler : AuthorizationHandler<ResourceOwnerRequirement>
+    public class ResourceOwnerHandler : AuthorizationHandler<PartOfPathRequirement>
     {
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly UserAuthentication _authentication;
@@ -15,7 +15,7 @@ namespace timesheet_api.Utils
             _authentication = authentication;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ResourceOwnerRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PartOfPathRequirement requirement)
         {
             var httpContext = _contextAccessor.HttpContext;
             var parts = httpContext.Request.Path.ToString().Split("/");

@@ -1,10 +1,10 @@
 using  Microsoft.AspNetCore.Authorization;
 
-namespace timesheet_api.Utils
+namespace timesheet_api.Authentication
 {
-    public class ResourceOwnerRequirement : IAuthorizationRequirement
+    public class PartOfPathRequirement : IAuthorizationRequirement
     {
-        public ResourceOwnerRequirement(int pathOffset)
+        public PartOfPathRequirement(int pathOffset)
         {
             PathOffset = pathOffset;
         }

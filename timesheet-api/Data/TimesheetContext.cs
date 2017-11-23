@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using timesheet_api.Models;
 
-namespace timesheet_api.Models
+namespace timesheet_api.Data
 {
     public class TimesheetContext : DbContext
     {

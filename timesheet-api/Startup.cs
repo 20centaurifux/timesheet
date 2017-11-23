@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Bazinga.AspNetCore.Authentication.Basic;
@@ -14,8 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Net;
+using timesheet_api.Data;
+using timesheet_api.Authentication;
 
 namespace timesheet_api
 {
@@ -31,21 +30,21 @@ namespace timesheet_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<Models.TimesheetContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<TimesheetContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<Utils.UserAuthentication>();
-            services.AddTransient<IAuthorizationHandler, Utils.ResourceOwnerHandler>();
+            services.AddScoped<UserAuthentication>();
+            services.AddTransient<IAuthorizationHandler, ResourceOwnerHandler>();
 
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = BasicAuthenticationDefaults.AuthenticationScheme;
             })
-            .AddBasicAuthentication<Utils.BasicAuthVerifier>();
+            .AddBasicAuthentication<BasicAuthVerifier>();
             
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("TimesheetOwner", policy => policy.Requirements.Add(new Utils.ResourceOwnerRequirement(2)));
+                options.AddPolicy("TimesheetOwner", policy => policy.Requirements.Add(new PartOfPathRequirement(2)));
             });
         }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using timesheet_api.Models;
 using timesheet_api.Models.View;
+using timesheet_api.Data;
 
 namespace timesheet_api.Controllers
 {
@@ -14,7 +15,7 @@ namespace timesheet_api.Controllers
     [Route("/[controller]")]
     public class TasksController : Controller
     {
-        private TimesheetContext _context;
+        private readonly TimesheetContext _context;
 
         public  TasksController(TimesheetContext context)
         {

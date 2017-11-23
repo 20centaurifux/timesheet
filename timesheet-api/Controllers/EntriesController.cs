@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using timesheet_api.Models;
 using timesheet_api.Models.View;
+using timesheet_api.Data;
 
 namespace timesheet_api.Controllers
 {

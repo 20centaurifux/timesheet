@@ -1,4 +1,4 @@
-namespace  timesheet_api.Utils
+namespace  timesheet_api.Authentication
 {
     public class UserAuthentication
     {
