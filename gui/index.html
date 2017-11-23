@@ -15,7 +15,6 @@
 	<script src="js/bootstrap-timepicker.js"></script>
 	<script src="js/bootstrap-select.min.js"></script>
 	<script src="js/moment.min.js"></script>
-	<script src="js/moment.min.js"></script>
 	<script src="js/bootstrap-datetimepicker.min.js"></script>
 	<script src="js/vue.min.js"></script>
 	<script src="js/components.js"></script>
@@ -77,6 +76,32 @@
 		</div>
 	</template>
 
+	<template id=authDialog>
+		<div class="modal fade">
+		    <div class="modal-dialog">
+			<div class="modal-content">
+			    <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">User authentication</h4>
+			    </div>
+			    <div class="modal-body">
+				<p>Please enter user credentials.</p>
+				 <div class="form-group">
+					 <label for="userName">Username</label>
+					 <input :value="username" type="text" class="form-control" id="userPassword" placeholder="Username">
+					 <label for="userPassword">Password</label>
+					 <input :value="password" type="password" class="form-control" id="userPassword" placeholder="Password">
+				 </div>
+			    </div>
+			    <div class="modal-footer">
+				<button type="button" class="btn btn-primary" @click="updateCredentials">Reconnect</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			    </div>
+			</div>
+		    </div>
+		</div>
+	</template>
+
 	<script type="text/javascript">
 		$(document).ready(function()
 		{
@@ -89,8 +114,8 @@
 					availableTasks: {},
 					availableProjects: {},
 					date: new Date(),
-					restUser: "foxmulder",
-					restPassword: "trustno1"
+					restUser: "",
+					restPassword: ""
 				},
 				created: function()
 				{
@@ -101,7 +126,7 @@
 						this.rest().deleteEntry(task.id)
 							.success(function(task)
 							{
-								var index = tasks.findIndex(function(e) {return e.id == task.id});
+								var index = tasks.findIndex(function(e) { return e.id == task.id });
 								tasks.splice(index, 1);
 							})
 							.fail(function()
@@ -155,9 +180,27 @@
 								alert("Oh no, something went wrong. Couldn't update entry, please try again later.");
 							});
 					});
+
+					this.$on('update-credentials', function(credentials)
+					{
+						this.restUser = credentials.username;
+						this.restPassword = credentials.password;
+
+						this.loadData();
+
+    						localStorage.setItem("rest.Username", this.restUser);
+    						localStorage.setItem("rest.Password", this.restPassword);
+					});
 				},
 				mounted: function()
 				{
+					try
+					{
+						this.restUser = localStorage.getItem('rest.Username');
+						this.restPassword = localStorage.getItem('rest.Password');
+					}
+					catch(e) {}
+
 					this.loadData();
 				},
 				methods:
@@ -236,7 +279,11 @@
 		</ul>
 
 		<ul class="nav navbar-nav navbar-right">
-			<li><a href="#"><span class="glyphicon glyphicon-user"></span> User</a></li>
+			<li>
+				<a data-target="#dialog-authentication" data-toggle="modal" href="#">
+					<span class="glyphicon glyphicon-user"></span> User
+				</a>
+			</li>
 		</ul>
 	</div>
 </nav>
@@ -257,7 +304,8 @@
 			<add-task-button :tasks="tasks"></add-task-button>
 		</div>
 	</div>
-  </div>
 
+	<auth-dialog id="dialog-authentication" :username="restUser" :password="restPassword"></auth-dialog>
+  </div>
   </body>
 </html>

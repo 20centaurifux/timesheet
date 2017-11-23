@@ -123,3 +123,19 @@ Vue.component('datePicker',
 			.on('dp.change', function(e) { app.$emit('date-changed', e.date.toDate()) });
 	}
 });
+
+Vue.component('authDialog',
+{
+	props: ['username', 'password'],
+	template: '#authDialog',
+	methods:
+	{
+		updateCredentials()
+		{
+			app.$emit('update-credentials',
+				  {username: $(this.$el).find('input:eq(0)').val(),
+				   password: $(this.$el).find('input:eq(1)').val()});
+			$(this.$el).modal('hide');
+		}
+	}
+});
