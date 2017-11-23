@@ -34,40 +34,44 @@ namespace timesheet_api.Controllers
         }
 
         [HttpPost("/timesheet/{username}/{year}/{month}/{day}")]
-        public EntryView Post(string username, int year, int month, int day, [FromBody]EntryView entry)
+        public IActionResult Post(string username, int year, int month, int day, [FromBody]EntryView entry)
         {
-            var task = _context.Tasks
-                .Include(t => t.ProjectGroup)
-                .Single(t => t.Name == entry.task);
-            
-            var project = _context.Projects
-                .Include(g => g.Group)
-                .Single(p => p.Name == entry.project);
-            
-            var user = _context.Users.Single(u => u.Name == username);
-            var minutes = timesheet_api.Utils.Converter.TimeStringToMinutes(entry.hours);
-
-            EntryView result = null;
-
-            if(user != null && task.ProjectGroup.Id == project.Group.Id)
+            try
             {
-                var e = new Entry()
-                {
-                    Date = new DateTime(year, month, day),
-                    Minutes = minutes,
-                    Task = task,
-                    Project = project,
-                    User = user
-                };
-
-                _context.Entries.Add(e);
-                _context.SaveChanges();
+                var task = _context.Tasks
+                    .Include(t => t.ProjectGroup)
+                    .Single(t => t.Name == entry.task);
                 
-                entry.id = e.Id;
-                result = entry;
-            }
+                var project = _context.Projects
+                    .Include(g => g.Group)
+                    .Single(p => p.Name == entry.project);
+                
+                var user = _context.Users.Single(u => u.Name == username);
+                var minutes = timesheet_api.Utils.Converter.TimeStringToMinutes(entry.hours);
 
-            return result;
+                if(task.ProjectGroup.Id == project.Group.Id)
+                {
+                    var e = new Entry()
+                    {
+                        Date = new DateTime(year, month, day),
+                        Minutes = minutes,
+                        Task = task,
+                        Project = project,
+                        User = user
+                    };
+
+                    _context.Entries.Add(e);
+                    _context.SaveChanges();
+                    
+                    entry.id = e.Id;
+
+                    return Created(nameof(Get), entry);
+                }
+            }
+            catch (System.InvalidOperationException) {}
+            catch (System.ArgumentException) {}
+
+            return BadRequest();
         }
     }
 }
