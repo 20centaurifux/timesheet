@@ -12,21 +12,21 @@ the "appsettings" and run the following commands:
 	$ cd timesheet-api
 	$ dotnet ef database update
 
-To insert demo data connect to the database and run the "InitialData.sql"
-script. Then start the self-hosted web server:
+Connect to the database and run the "InitialData.sql" script to insert demo data.
+Then start the self-hosted web server:
 
 	$ dotnet run
 
 ## timesheet-gui
 
 The frontend is a single HTML page. Open the file in your web browser
-(Firefox and Chrome work fine) and click on the "User" button. Then enter the
-credentials of the previously created demo account:
+(Firefox and Chrome work fine) and click on the "Authentication" link. Then enter
+the credentials of the previously created demo account:
 
 * username: foxmulder
 * password: trustno1
 
 Click the "Reconnect" button to connect the app to the REST service.
 
-The URL of the REST API can be configured in the "timesheet.rest.js" Javascript
+The URL of the REST API can be configured in the "timesheet.rest.js" JavaScript
 file.
