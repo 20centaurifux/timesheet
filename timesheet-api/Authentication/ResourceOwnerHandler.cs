@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace timesheet_api.Authentication
             var httpContext = _contextAccessor.HttpContext;
             var parts = httpContext.Request.Path.ToString().Split("/");
 
-            if(parts[requirement.PathOffset].Equals(_authentication.UserName))
+            if(parts[requirement.PathOffset].Equals(_authentication.UserName, StringComparison.CurrentCultureIgnoreCase))
             {
                 context.Succeed(requirement);
             }
