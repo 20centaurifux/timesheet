@@ -186,7 +186,10 @@
 						this.restUser = credentials.username;
 						this.restPassword = credentials.password;
 
-						this.loadData();
+						this.loadData(function(cred)
+						{
+							alert("You're now authenticated as " + credentials.username + ".");
+						});
 
     						localStorage.setItem("rest.Username", this.restUser);
     						localStorage.setItem("rest.Password", this.restPassword);
@@ -205,7 +208,7 @@
 				},
 				methods:
 				{
-					loadData()
+					loadData(onSuccess)
 					{
 						var self = this;
 						var rest = this.rest();
@@ -219,7 +222,11 @@
 									self.availableProjects = projects[0];
 									self.loadDay();
 								}
-									
+
+								if(onSuccess)
+								{
+									onSuccess();
+								}
 							})
 							.fail(function(err)
 							{
@@ -298,7 +305,9 @@
 	</div>
 
 	<div class="row">
-		<task-table :tasks="tasks" :available-tasks="availableTasks" :available-projects="availableProjects"></task-table>
+		<div class="col-sm-12">
+			<task-table :tasks="tasks" :available-tasks="availableTasks" :available-projects="availableProjects"></task-table>
+		</div>
 	</div>
 
 	<div class="row">
