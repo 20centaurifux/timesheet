@@ -16,7 +16,7 @@ Vue.component('taskRow',
 	{
 		// column 1 - timepicker:
 		$(this.$el).find('input')
-			.timepicker({showMeridian: false, maxHours: 12, defaultTime: '00:00 AM'}).val(this.task['hours'])
+			.timepicker({showMeridian: false, maxHours: 12, defaultTime: this.task.hours + ' AM'}).val(this.task['hours'])
 			.bind('change', this.notifyUpdate);
 
 		// column 2 - task list:
