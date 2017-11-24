@@ -174,7 +174,14 @@
 
 					this.$on('task-updated', function(task)
 					{
+						var self = this;
+
 						this.rest().updateEntry(task)
+							.success(function()
+							{
+								var index = self.tasks.findIndex(function(e) { return e.id == task.id });
+								self.$set(self.tasks, index, task);
+							})
 							.fail(function()
 							{
 								alert("Oh no, something went wrong. Couldn't update entry, please try again later.");
@@ -191,8 +198,8 @@
 							alert("You're now authenticated as " + credentials.username + ".");
 						});
 
-    						localStorage.setItem("rest.Username", this.restUser);
-    						localStorage.setItem("rest.Password", this.restPassword);
+						localStorage.setItem("rest.Username", this.restUser);
+						localStorage.setItem("rest.Password", this.restPassword);
 					});
 				},
 				mounted: function()
@@ -299,8 +306,11 @@
 
   <div class="container" id="root">
 	<div class="row">
-		<div class="col-sm-4 col-sm-offset-4">
+		<div class="col-sm-4 col-sm-offset-3">
 			<date-picker></date-picker>
+		</div>
+		<div class="col-sm-4">
+			<productivity :available-tasks="availableTasks" :tasks="tasks"></productivity>
 		</div>
 	</div>
 

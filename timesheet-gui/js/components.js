@@ -124,6 +124,42 @@ Vue.component('datePicker',
 	}
 });
 
+Vue.component('productivity',
+{
+	props: ['availableTasks', 'tasks'],
+	template: '<p><strong>Productivity:</strong> {{calculateProducivity()}}%</p>',
+	methods:
+	{
+		calculateProducivity()
+		{
+			var self = this;
+			var total = 0;
+			var productive = 0;
+			var e = 0;
+
+			this.tasks.forEach(function(e)
+			{
+				var m = e.hours.match(/(\d{1,2}):(\d{1,2})/);
+				var minutes = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+
+				total += minutes;
+
+				if(self.availableTasks[e.task].productive)
+				{
+					productive += minutes;
+				}
+			});
+
+			if(total)
+			{
+				e = Math.floor(productive / total * 100);
+			}
+
+			return e;
+		}
+	}
+});
+
 Vue.component('authDialog',
 {
 	props: ['username', 'password'],
