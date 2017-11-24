@@ -19,7 +19,7 @@ namespace timesheet_api.Authentication
 
         public System.Threading.Tasks.Task<bool> Authenticate(string username, string password)
         {
-            var result = false;
+            var success = false;
 
             try
             {
@@ -31,19 +31,17 @@ namespace timesheet_api.Authentication
 
                 if(user != null)
                 {
-                    result = _authentication.PasswordHash.Equals(user.Password);
+                    success = _authentication.PasswordHash.Equals(user.Password);
 
-                    if(result)
+                    if(success)
                     {
                         _authentication.Authenticated = true;
                     }
                 }
-
-                return System.Threading.Tasks.Task.FromResult(result);
             }
             catch (System.InvalidOperationException) {}
 
-            return System.Threading.Tasks.Task.FromResult(result);
+            return System.Threading.Tasks.Task.FromResult(success);
         }
     }
 }

@@ -20,7 +20,6 @@ namespace timesheet_api.Controllers
             _context = context;
         }
 
-        // GET api/projects
         [HttpGet]
         public Dictionary<string, IEnumerable<string>> Get()
         {

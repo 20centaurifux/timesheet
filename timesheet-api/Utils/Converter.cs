@@ -8,25 +8,26 @@ namespace timesheet_api.Utils
         public static int TimeStringToMinutes(string time)
         {
             var regex = new Regex("(\\d{1,2}):(\\d{1,2})");
-            var m = regex.Match(time);
+            var match = regex.Match(time);
             int minutes = 0;
 
-            if(m.Groups.Count == 3)
+            if(match.Groups.Count == 3)
             {
-                var a = Convert.ToInt32(m.Groups[1].ToString());
-                var b = Convert.ToInt32(m.Groups[2].ToString());
+                var hours = Convert.ToInt32(match.Groups[1].ToString());
 
-                if(a < 0 || b < 0)
+                minutes = Convert.ToInt32(match.Groups[2].ToString());
+
+                if(hours < 0 || minutes < 0)
                 {
                     throw new ArgumentException();
                 }
 
-                if(a > 59 || b > 60)
+                if(hours > 23 || minutes > 59)
                 {
                     throw new ArgumentException();
                 }
 
-                minutes = a * 60 + b;
+                minutes += hours * 60;
             }
             else
             {

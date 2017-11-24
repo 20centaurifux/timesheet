@@ -22,7 +22,6 @@ namespace timesheet_api.Controllers
             _context = context;
         }
 
-        // GET api/tasks
         [HttpGet]
         public Dictionary<string, TaskView> Get()
         {

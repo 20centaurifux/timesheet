@@ -7,10 +7,10 @@ namespace timesheet_api.Utils
     {
         public static string PasswordHash(string text)
         {
-            var data = System.Text.UTF8Encoding.UTF8.GetBytes(text);
+            var bytes = System.Text.UTF8Encoding.UTF8.GetBytes(text);
             var sha256 = new SHA256Managed();
 
-            return BitConverter.ToString(sha256.ComputeHash(data), 0).Replace("-", String.Empty);
+            return BitConverter.ToString(sha256.ComputeHash(bytes), 0).Replace("-", String.Empty);
         }
     }
 }

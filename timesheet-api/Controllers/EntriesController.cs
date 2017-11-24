@@ -52,7 +52,7 @@ namespace timesheet_api.Controllers
             {
                 return new Entry()
                 {
-                    Minutes =  timesheet_api.Utils.Converter.TimeStringToMinutes(entry.hours),
+                    Minutes = timesheet_api.Utils.Converter.TimeStringToMinutes(entry.hours),
                     Task = task,
                     Project = project,
                 };
@@ -66,17 +66,17 @@ namespace timesheet_api.Controllers
         {
             try
             {
-                var e = EntryView_TryParse(entry);
+                var newEntry = EntryView_TryParse(entry);
                 
-                if(e != null)
+                if(newEntry != null)
                 {
-                    e.Date = new DateTime(year, month, day);
-                    e.User = _context.Users.Single(u => u.Name.Equals(username, StringComparison.CurrentCultureIgnoreCase));
+                    newEntry.Date = new DateTime(year, month, day);
+                    newEntry.User = _context.Users.Single(u => u.Name.Equals(username, StringComparison.CurrentCultureIgnoreCase));
 
-                    _context.Entries.Add(e);
+                    _context.Entries.Add(newEntry);
                     _context.SaveChanges();
                     
-                    entry.id = e.Id;
+                    entry.id = newEntry.Id;
 
                     return Created(nameof(Get), entry);
                 }
@@ -92,19 +92,19 @@ namespace timesheet_api.Controllers
         {
             try
             {
-                var a = _context.Entries.Single(e => e.Id == entry.id);
-                var b = EntryView_TryParse(entry);
+                var to = _context.Entries.Single(e => e.Id == entry.id);
+                var from = EntryView_TryParse(entry);
                 
-                if(a.User.Name.Equals(username, StringComparison.CurrentCultureIgnoreCase))
+                if(to.User.Name.Equals(username, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    a.Task = b.Task;
-                    a.Project = b.Project;
-                    a.Minutes = b.Minutes;
+                    to.Task = from.Task;
+                    to.Project = from.Project;
+                    to.Minutes = from.Minutes;
 
-                    _context.Entries.Update(a);
+                    _context.Entries.Update(to);
                     _context.SaveChanges();
 
-                    return Ok(Json(EntryView.FromEntry(a)));
+                    return Ok(Json(EntryView.FromEntry(to)));
                 }
                 else
                 {
