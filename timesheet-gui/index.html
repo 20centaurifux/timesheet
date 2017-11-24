@@ -124,7 +124,7 @@
 						var tasks = this.tasks;
 
 						this.rest().deleteEntry(task.id)
-							.success(function(task)
+							.success(function()
 							{
 								var index = tasks.findIndex(function(e) { return e.id == task.id });
 								tasks.splice(index, 1);
