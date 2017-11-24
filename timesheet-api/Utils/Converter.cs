@@ -13,8 +13,20 @@ namespace timesheet_api.Utils
 
             if(m.Groups.Count == 3)
             {
-                minutes = Convert.ToInt32(m.Groups[1].ToString()) * 60;
-                minutes += Convert.ToInt32(m.Groups[2].ToString());
+                var a = Convert.ToInt32(m.Groups[1].ToString());
+                var b = Convert.ToInt32(m.Groups[2].ToString());
+
+                if(a < 0 || b < 0)
+                {
+                    throw new ArgumentException();
+                }
+
+                if(a > 59 || b > 60)
+                {
+                    throw new ArgumentException();
+                }
+
+                minutes = a * 60 + b;
             }
             else
             {
