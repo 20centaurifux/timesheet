@@ -41,10 +41,11 @@ namespace timesheet_api.Utils
 
         public static string SecondsToTimeString(int seconds)
         {
-            int minutes = seconds / 60;
-            int hours = minutes / 60;
+            int minutes = (int)Math.Floor((double)seconds / 60);
+            int hours = (int)Math.Floor((double)minutes / 60);
 
-            seconds -= hours * 60 + minutes * 60;
+            minutes -= hours * 60;
+            seconds -= hours * 3600 + minutes * 60;
 
             return string.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds);
         }
