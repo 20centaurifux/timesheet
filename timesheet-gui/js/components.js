@@ -16,7 +16,7 @@ Vue.component('taskRow',
 	{
 		// column 1 - timepicker:
 		$(this.$el).find('input')
-			.timepicker({showMeridian: false, maxHours: 12, defaultTime: this.task.hours + ' AM'}).val(this.task['hours'])
+			.timepicker({showMeridian: false, showSeconds: true, maxHours: 12, defaultTime: this.task.hours + ' AM'}).val(this.task['hours'])
 			.bind('change', this.notifyUpdate);
 
 		// column 2 - task list:
@@ -139,14 +139,14 @@ Vue.component('productivity',
 
 			this.tasks.forEach(function(e)
 			{
-				var m = e.hours.match(/(\d{1,2}):(\d{1,2})/);
-				var minutes = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+				var m = e.hours.match(/(\d{1,2}):(\d{1,2}):(\d{1,2})/);
+				var seconds = parseInt(m[1], 10) * 60 * 60 + parseInt(m[2], 10) * 60 + parseInt(m[3], 10);
 
-				total += minutes;
+				total += seconds;
 
 				if(self.availableTasks[e.task].productive)
 				{
-					productive += minutes;
+					productive += seconds;
 				}
 			});
 

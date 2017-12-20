@@ -5,45 +5,48 @@ namespace timesheet_api.Utils
 {
     public static class Converter
     {
-        public static int TimeStringToMinutes(string time)
+        public static int TimeStringToSeconds(string time)
         {
-            var regex = new Regex("(\\d{1,2}):(\\d{1,2})");
+            var regex = new Regex("(\\d{1,2}):(\\d{1,2}):(\\d{1,2})");
             var match = regex.Match(time);
-            int minutes = 0;
+            int seconds = 0;
 
-            if(match.Groups.Count == 3)
+            if(match.Groups.Count == 4)
             {
                 var hours = Convert.ToInt32(match.Groups[1].ToString());
+                var minutes = Convert.ToInt32(match.Groups[2].ToString());
 
-                minutes = Convert.ToInt32(match.Groups[2].ToString());
+                seconds = Convert.ToInt32(match.Groups[3].ToString());
 
-                if(hours < 0 || minutes < 0)
+                if(hours < 0 || minutes < 0 || seconds < 0)
                 {
                     throw new ArgumentException();
                 }
 
-                if(hours > 23 || minutes > 59)
+                if(hours > 23 || minutes > 59 || seconds > 60)
                 {
                     throw new ArgumentException();
                 }
 
                 minutes += hours * 60;
+                seconds += minutes * 60;
             }
             else
             {
                 throw new ArgumentException();
             }
 
-            return minutes;
+            return seconds;
         }
 
-        public static string MinutesToTimeString(int minutes)
+        public static string SecondsToTimeString(int seconds)
         {
+            int minutes = seconds / 60;
             int hours = minutes / 60;
-            
-            minutes -= hours * 60;
 
-            return string.Format("{0:00}:{1:00}", hours, minutes);
+            seconds -= hours * 60 + minutes * 60;
+
+            return string.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds);
         }
     }
 }

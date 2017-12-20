@@ -11,9 +11,10 @@ using timesheet_api.Data;
 namespace timesheetapi.Migrations
 {
     [DbContext(typeof(TimesheetContext))]
-    partial class TimesheetContextModelSnapshot : ModelSnapshot
+    [Migration("20171220060456_rev4")]
+    partial class rev4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

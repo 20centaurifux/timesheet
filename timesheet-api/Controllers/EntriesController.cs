@@ -52,7 +52,7 @@ namespace timesheet_api.Controllers
             {
                 return new Entry()
                 {
-                    Minutes = timesheet_api.Utils.Converter.TimeStringToMinutes(entry.hours),
+                    Seconds = timesheet_api.Utils.Converter.TimeStringToSeconds(entry.hours),
                     Task = task,
                     Project = project,
                 };
@@ -99,7 +99,7 @@ namespace timesheet_api.Controllers
                 {
                     to.Task = from.Task;
                     to.Project = from.Project;
-                    to.Minutes = from.Minutes;
+                    to.Seconds = from.Seconds;
 
                     _context.Entries.Update(to);
                     _context.SaveChanges();

@@ -12,7 +12,7 @@ namespace timesheet_api.Models.View
             var e = new EntryView();
 
             e.id = entry.Id;
-            e.hours = Converter.MinutesToTimeString(entry.Minutes);
+            e.hours = Converter.SecondsToTimeString(entry.Seconds);
             e.task = entry.Task.Name;
 
             if(entry.Project != null)
