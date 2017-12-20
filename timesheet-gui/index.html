@@ -61,7 +61,10 @@
 				<select></select>
 			</td>
 			<td></td>
-			<td><remove-task-button :task="task"></remove-task-button></td>
+			<td>
+				<timer-button :task="task" :interval="5"></timer-button>
+				<remove-task-button :task="task"></remove-task-button>
+			</td>
 		</tr>
 	</template>
 
@@ -188,6 +191,30 @@
 							});
 					});
 
+					this.$on('tick', function(taskId, interval)
+					{
+						var self = this;
+						var index = self.tasks.findIndex(function(e) { return e.id == taskId });
+						var task = self.tasks[index];
+
+						seconds = this.stringToSeconds(task.hours) + interval;
+
+						if(seconds < 12 * 3600)
+						{
+							task.hours = this.secondsToString(seconds);
+
+							this.rest().updateEntry(task)
+								.success(function()
+								{
+									self.$set(self.tasks, index, task);
+								})
+								.fail(function()
+								{
+									alert("Oh no, something went wrong. Couldn't update entry, please try again later.");
+								});
+						}
+					});
+
 					this.$on('update-credentials', function(credentials)
 					{
 						this.restUser = credentials.username;
@@ -274,6 +301,32 @@
 					{
 						this.restUser = username;
 						this.restPassword = password;
+					},
+					secondsToString(seconds)
+					{
+						function appendZero(n)
+						{
+							if(n < 10)
+							{
+								return '0' + n;
+							}
+
+							return n.toString();
+						}
+
+						var minutes = Math.floor(seconds / 60);
+						var hours = Math.floor(minutes / 60);
+
+						minutes -= hours * 60;
+						seconds -= hours * 3600 + minutes * 60;
+
+						return appendZero(hours) + ':' + appendZero(minutes) + ':' + appendZero(seconds);
+					},
+					stringToSeconds(str)
+					{
+						var m = str.match(/(\d{1,2}):(\d{1,2}):(\d{1,2})/);
+
+						return parseInt(m[1], 10) * 3600 + parseInt(m[2], 10) * 60 + parseInt(m[3], 10);
 					}
 				}
 			});
@@ -295,7 +348,7 @@
 
 		  <div id="navbar" class="navbar-collapse collapse">
 			  <ul class="nav navbar-nav">
-				  <li class="active"><a href="#">My timesheet</a></li>
+				  <li class="active"><a href="#">My Timesheet</a></li>
 			  </ul>
 			  <ul class="nav navbar-nav navbar-right">
 				  <li><a data-target="#dialog-authentication" data-toggle="modal" href="#">Authentication</a></li>

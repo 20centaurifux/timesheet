@@ -37,6 +37,23 @@ Vue.component('taskRow',
 		// populate column 3 by calling taskChanged() event:
 		this.taskChanged(true);
 	},
+	watch:
+	{
+		task:
+		{
+			handler: function(val, oldVal)
+			{
+				$(this.$el).find('input').val(val['hours']);
+				$(this.$el).find('select:first').val(val['task']);
+
+				if(val['project'])
+				{
+					$(this.$el).find('select:eq(1)').val(val['project']);
+				}
+			},
+			deep: true
+		}
+	},
 	methods:
 	{
 		taskChanged: function(internal)
@@ -113,6 +130,51 @@ Vue.component('removeTaskButton',
 	}
 });
 
+Vue.component('timerButton',
+{
+	props: ['task', 'interval'],
+	data: function()
+	{
+		return {started: false, intervalId: null}
+	},
+	template: '<button class="btn btn-default" data-interval-id="" @click="toggleTimer()">Start Timer</button>',
+	methods:
+	{
+		toggleTimer: function()
+		{
+			if(this.started)
+			{
+				clearInterval(this.intervalId);
+
+				$(this.$el).text('Start Timer');
+				this.started = false;
+			}
+			else
+			{
+				var taskId = this.task.id;
+				var interval = this.interval;
+
+				this.intervalId = setInterval(function()
+				{
+					app.$emit('tick', taskId, interval);
+				}, interval * 1000);
+
+				$(this.$el).text('Stop Timer');
+				this.started = true;
+			}
+
+			$(this.$el).toggleClass('btn-info btn-default');
+		}
+	},
+	beforeDestroy: function()
+	{
+		if(this.started)
+		{
+			clearInterval(this.intervalId);
+		}
+	}
+});
+
 Vue.component('datePicker',
 {
 	template: '#datePicker',
@@ -127,7 +189,7 @@ Vue.component('datePicker',
 Vue.component('productivity',
 {
 	props: ['availableTasks', 'tasks'],
-	template: '<p><strong>Productivity:</strong> {{calculateProducivity()}}%</p>',
+	template: '<p><strong>Efficiency:</strong> {{calculateProducivity()}}%</p>',
 	methods:
 	{
 		calculateProducivity()
