@@ -304,7 +304,7 @@
 					},
 					secondsToString(seconds)
 					{
-						function appendZero(n)
+						function prependZero(n)
 						{
 							if(n < 10)
 							{
@@ -320,7 +320,7 @@
 						minutes -= hours * 60;
 						seconds -= hours * 3600 + minutes * 60;
 
-						return appendZero(hours) + ':' + appendZero(minutes) + ':' + appendZero(seconds);
+						return prependZero(hours) + ':' + prependZero(minutes) + ':' + prependZero(seconds);
 					},
 					stringToSeconds(str)
 					{
