@@ -1,7 +1,7 @@
 # Timesheet - README
 
 **Timesheet** is the prototype of a progressive timesheet web app with support
-for multiple user accounts. It's divided into to two parts:
+for multiple user accounts. It's divided into two parts:
 
 ## timesheet-api
 
